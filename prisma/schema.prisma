@@ -7,37 +7,40 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Users {
-  id       Int        @id @default(autoincrement())
-  name     String?    @unique(map: "uq_users_name")
-  password String?
-  catalogs Catalogs[]
-  orders   Orders[]
-}
-
-
-model Catalogs {
+model catalogs {
   id        Int        @id @default(autoincrement())
   seller_id Int?
-  users     Users?     @relation(fields: [seller_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_catalog_users")
-  orders    Orders[]
-  products  Products[]
+  users     users?     @relation(fields: [seller_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_catalog_users")
+  orders    orders[]
+  products  products[]
 }
 
-model Orders {
+model orders {
   id         Int       @id @default(autoincrement())
   buyer_id   Int?
   catalog_id Int?
   products   Int[]
-  catalogs   Catalogs? @relation(fields: [catalog_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_catalogs")
-  users      Users?    @relation(fields: [buyer_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_users_buyer")
+  catalogs   catalogs? @relation(fields: [catalog_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_catalogs")
+  users      users?    @relation(fields: [buyer_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_users_buyer")
 }
 
-model Products {
+model products {
   id           Int       @id @default(autoincrement())
   catalog_id   Int?
   product_name String
   price        Int?
-  catalogs     Catalogs? @relation(fields: [catalog_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_products_catalogs")
+  catalogs     catalogs? @relation(fields: [catalog_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_products_catalogs")
 }
 
+model test {
+  id   Int     @id @default(autoincrement())
+  test String?
+}
+
+model users {
+  id       Int        @id @default(autoincrement())
+  name     String?    @unique(map: "uq_users_name")
+  password String?
+  catalogs catalogs[]
+  orders   orders[]
+}
