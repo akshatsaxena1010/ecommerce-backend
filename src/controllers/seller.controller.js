@@ -11,7 +11,7 @@ exports.createCatalog = async (req, res) => {
       return;
     }
 
-    if (await prisma.catalogs.findMany({ where: { seller_id: req.user.id } })) {
+    if ((await prisma.catalogs.findMany({ where: { seller_id: req.user.id } })).length !== 0) {
       res.status(409).send({ status: 'CONFLICT', message: 'Catalog Already Exists' });
       return;
     }
@@ -40,38 +40,25 @@ exports.createCatalog = async (req, res) => {
 
 exports.orders = async (req, res) => {
   try {
-    const orderDetails = await prisma.users.findUnique({
+    const orderDetails = await prisma.catalogs.findFirst({
       where: {
-        id: req.user.id,
+        seller_id: req.user.id,
       },
       select: {
-        catalogs: {
+        orders: {
           include: {
-            orders: {
-              include: {
-                users: {
-                  select: {
-                    name: true,
-                  },
-                },
-              },
-            },
+            users: true,
           },
         },
       },
     });
 
-    if (orderDetails.catalogs.length === 0) {
-      res.status(204).send({ status: 'NO CONTENT', message: 'No catalog found for the user' });
-      return;
-    }
-
-    if (orderDetails.catalogs[0].orders.length === 0) {
+    if (orderDetails.orders.length === 0) {
       res.status(204).send({ status: 'NO CONTENT', message: 'No order found for the user' });
       return;
     }
 
-    const orders = orderDetails.catalogs[0].orders.map((order) => ({
+    const orders = orderDetails.orders.map((order) => ({
       orderId: order.id,
       catalogId: order.catalog_id,
       products: order.products,
@@ -81,7 +68,6 @@ exports.orders = async (req, res) => {
     res.status(200).send({ status: 'SUCCESS', orders });
     return;
   } catch (err) {
-    console.log(err);
     res.status(500).send({ status: 'INTERNAL_SERVER_ERROR' });
   }
 };
