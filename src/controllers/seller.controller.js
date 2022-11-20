@@ -11,7 +11,6 @@ exports.createCatalog = async (req, res) => {
       return;
     }
 
-    // TODO: Check if products are there
     if (await prisma.catalogs.findMany({ where: { seller_id: req.user.id } })) {
       res.status(409).send({ status: 'CONFLICT', message: 'Catalog Already Exists' });
       return;
@@ -83,6 +82,22 @@ exports.orders = async (req, res) => {
     return;
   } catch (err) {
     console.log(err);
+    res.status(500).send({ status: 'INTERNAL_SERVER_ERROR' });
+  }
+};
+
+exports.catalogDetails = async (req, res) => {
+  try {
+    const catalogDetails = await prisma.catalogs.findFirst({
+      where: {
+        seller_id: req.user.id,
+      },
+      include: {
+        products: true,
+      },
+    });
+    res.status(200).send({ status: 'SUCCESS', catalogDetails });
+  } catch (err) {
     res.status(500).send({ status: 'INTERNAL_SERVER_ERROR' });
   }
 };

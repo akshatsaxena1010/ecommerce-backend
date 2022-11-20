@@ -18,7 +18,7 @@ router.use('/', (req, res, next) => {
 });
 
 router.post('/create-catalog', sellerController.createCatalog);
-
 router.get('/order', sellerController.orders);
+router.get('/catalog-details', sellerController.catalogDetails);
 
 module.exports = router;
