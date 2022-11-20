@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const prisma = new PrismaClient();
+const ACCESS_TOKEN_SECRET = 'oqerwRZqbkmExBJmZasnXSPjmdIQHJFcVzlMnHfflmVjAPApmxXmwHMijiSF';
 
 exports.validateUserInput = ((req, res, next) => {
   if (!req.body || !req.body.name || !req.body.password) {
@@ -54,7 +55,7 @@ exports.loginUser = async (req, res) => {
       return;
     }
 
-    const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
+    const accessToken = jwt.sign(user, ACCESS_TOKEN_SECRET);
 
     res.status(200).send({ status: 'SUCCESS', message: 'logged in successfully', accessToken });
     return;

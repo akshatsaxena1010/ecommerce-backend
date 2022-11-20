@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 
-// eslint-disable-next-line consistent-return
+const ACCESS_TOKEN_SECRET = 'oqerwRZqbkmExBJmZasnXSPjmdIQHJFcVzlMnHfflmVjAPApmxXmwHMijiSF';
+
 exports.authenticateToken = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
@@ -8,7 +9,7 @@ exports.authenticateToken = async (req, res, next) => {
 
     if (!token) return res.status(401).send({ status: 'UNAUTHORIZED', message: 'No token provided' });
 
-    req.user = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    req.user = jwt.verify(token, ACCESS_TOKEN_SECRET);
     next();
     return true;
   } catch (err) {
