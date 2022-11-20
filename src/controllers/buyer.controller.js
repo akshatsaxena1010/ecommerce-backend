@@ -2,6 +2,20 @@ const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
+exports.validateBuyer = (req, res, next) => {
+  if (!req.user || !req.user.name) {
+    res.status(400).send({ status: 'BAD REQUEST', message: 'name and/or password is null.' });
+    return;
+  }
+
+  if (req.user.type !== 'buyer') {
+    res.status(403).send({ status: 'FORBIDDEN', message: 'User not authorized to access this endpoint' });
+    return;
+  }
+
+  next();
+};
+
 exports.listOfSellers = async (req, res) => {
   try {
     const sellers = await prisma.catalogs.findMany({
