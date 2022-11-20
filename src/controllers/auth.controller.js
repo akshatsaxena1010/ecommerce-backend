@@ -4,42 +4,14 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const prisma = new PrismaClient();
-// const authenticateToken = (req, res, next) => {
-//   const authHeader = req.headers.authorization;
-//   const token = authHeader && authHeader.split(' ')[1];
 
-//   if (token === null) {
-//     return res.sendStatus(401);
-//   }
-
-//   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-//     if (err) return res.sendStatus(403);
-//     req.user = user;
-//     next();
-//   });
-// };
-
-// router.get('/', async (req, res) => {
-//   console.log('Server has been initiated');
-//   res.status(200).send({ status: 'DSADSA' });
-// });
-
-// router.get('/test', authenticateToken, (req, res) => {
-//   console.log(req.user);
-//   console.log('sdsadsa');
-//   res.status(200).send({ status: 'DSADSA' });
-// });
-
-// router.post('/login', (req, res) => {
-//   // Authenticate user
-//   const { userName } = req.body;
-//   const user = {
-//     name: userName,
-//   };
-
-//   const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
-//   res.json({ accessToken });
-// });
+exports.validateUserInput = ((req, res, next) => {
+  if (!req.body || !req.body.name || !req.body.password) {
+    res.status(400).send({ status: 'BAD REQUEST', message: 'name and/or password is empty.' });
+    return;
+  }
+  next();
+});
 
 exports.registerUser = async (req, res) => {
   try {
