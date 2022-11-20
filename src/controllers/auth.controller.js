@@ -48,18 +48,24 @@ exports.registerUser = async (req, res) => {
       return;
     }
 
-    const user = {
-      name: req.body.name,
-      password: await bcrypt.hash(req.body.password, 5),
-    };
+    if (!req.body.type || !['buyer', 'seller'].includes(req.body.type.toLowerCase())) {
+      res.status(400).send({ status: 'BAD REQUEST', message: 'usertype is invalid' });
+      return;
+    }
 
-    const createdUser = await prisma.users.create({ data: user });
+    const createdUser = await prisma.users.create({
+      data: {
+        name: req.body.name,
+        password: await bcrypt.hash(req.body.password, 5),
+        type: req.body.type,
+      },
+    });
     if (createdUser) {
-      res.status(200).send({ status: 'SUCCESS', user: user.name });
+      res.status(200).send({ status: 'SUCCESS', user: req.body.name, type: req.body.type.toLowerCase() });
       return;
     }
   } catch (err) {
-    res.status(500).send({ status: 'INTERNAL_SERVER_ERROR' });
+    res.status(500).send({ status: 'INTERNAL_SERVER_ERROR', message: err });
   }
 };
 
@@ -76,7 +82,7 @@ exports.loginUser = async (req, res) => {
       return;
     }
 
-    const accessToken = jwt.sign(user.id, process.env.ACCESS_TOKEN_SECRET);
+    const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
 
     res.status(200).send({ status: 'SUCCESS', message: 'logged in successfully', accessToken });
     return;

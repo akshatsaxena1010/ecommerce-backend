@@ -39,8 +39,9 @@ model test {
 
 model users {
   id       Int        @id @default(autoincrement())
-  name     String?    @unique(map: "uq_users_name")
-  password String?
+  name     String     @unique(map: "uq_users_name")
+  password String
+  type     String
   catalogs catalogs[]
   orders   orders[]
 }
